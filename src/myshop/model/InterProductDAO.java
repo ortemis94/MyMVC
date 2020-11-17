@@ -24,6 +24,21 @@ public interface InterProductDAO {
 	// spec 목록을 보여주고자 한다.
 	List<SpecVO> selectSpecList() throws SQLException;
 
+	// 제품번호 채번 해오기
+	int getPnumOfProduct() throws SQLException;
+
+	// tbl_product 체이블에 제품정보 insert 하기
+	int productInsert(ProductVO pvo) throws SQLException;
+
+	// tbl_product_imagefile 테이블에 추가이미지 파일명 insert 해주기 
+	int product_imagefile_Insert(int pnum, String attachFileName) throws SQLException;
+
+	// 제품번호를 가지고서 해당 제품의 정보를 조회해오기
+	ProductVO selectOneProductByPnum(String pnum) throws SQLException;
+
+	// 제품번호를 가지고서 해당 제품의 추가된 이미지 정보를 조회해오기
+	List<String> getImagesByPnum(String pnum) throws SQLException;
+
 	
 	
 	

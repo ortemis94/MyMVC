@@ -64,7 +64,8 @@
 			
 			for (var i = 0; i < parseInt(cnt); i++) {
 				html += "<br>";
-				html += "<input type='file' name='attach"+i+"' class='btn btn-default' />";
+				html += "<input type='file' name='attach"+i+"' class='btn btn-default' />"; 
+				// 첨부파일은 배열로 보내기 안됨.
 			}// end of for-------------------------------------------------
 			
 			$("div#divfileattach").empty();
@@ -211,7 +212,7 @@
        		<label for="spinnerImgQty">파일갯수 : </label>
 		    <input id="spinnerImgQty" value="0" style="width: 30px; height: 20px;">
        		<div id="divfileattach"></div>
-       		<input type="text" name="attachCount" id="attachCount" /> 
+       		<input type="hidden" name="attachCount" id="attachCount" /> 
        	</td>
     </tr>
 	

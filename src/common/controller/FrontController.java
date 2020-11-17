@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 		description = "사용자가 웹에서 *.up 을 했을 경우 이 서블릿이 먼저 응답을 해주도록 한다.", 
 		urlPatterns = { "*.up" }, 
 		initParams = { // 초기화 파라미터
-				@WebInitParam(name = "propertyConfig", value = "C:/Users/권오윤/git/repository/MyMVC/WebContent/WEB-INF/Command.properties", description = "*.up 에 대한 클래스의 매핑파일")
+				@WebInitParam(name = "propertyConfig", value = "C:/NCS/workspace(jsp)/MyMVC/WebContent/WEB-INF/Command.properties", description = "*.up 에 대한 클래스의 매핑파일")
 		})														
 public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = 1L;

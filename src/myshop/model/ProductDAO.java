@@ -8,6 +8,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import member.model.MemberVO;
+
 public class ProductDAO implements InterProductDAO {
 
 	private DataSource ds; // DataSource ds 는 아파치톰캣이 제공하는 DBCP(DB Connection Pool) 이다.
@@ -423,8 +425,309 @@ public class ProductDAO implements InterProductDAO {
 		}
 		return imgList;
 	}
+
+	
+	// Ajax 를 이용한 특정 제품의 상품후기를 입력(insert)하기 
+	@Override
+	public int addComment(PurchaseReviewsVO previewvo) throws SQLException {
+		
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " insert into tbl_purchase_reviews(review_seq, fk_userid, fk_pnum, contents, writeDate) "
+					   + " values(seq_purchase_reviews.nextval, ?, ?, ?, default) ";
+					   
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, previewvo.getFk_userid());
+			pstmt.setInt(2, previewvo.getFk_pnum());
+			pstmt.setString(3, previewvo.getContents());
+			
+			n = pstmt.executeUpdate();
+			
+		} finally {
+			close();
+		}
+		return n;
+	}
+
+	
+	// Ajax를 이용한 특정 제품의 상품후기를 조회(select)하기
+	@Override
+	public List<PurchaseReviewsVO> commentList(String fk_pnum) throws SQLException {
+
+		List<PurchaseReviewsVO> CommentList = new ArrayList<PurchaseReviewsVO>();
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = " select review_seq, name, fk_pnum, contents, to_char(writeDate, 'yyyy-mm-dd hh24:mi:ss') AS writeDate "+
+					     " from tbl_purchase_reviews R join tbl_member M "+
+					     " on R.fk_userid = M.userid  "+
+					     " where R.fk_pnum = ? "+
+					     " order by review_seq desc ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, fk_pnum);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				String contents = rs.getString("contents");
+				String name = rs.getString("name");
+				String writeDate = rs.getString("writeDate");
+												
+				PurchaseReviewsVO previewvo = new PurchaseReviewsVO();
+				previewvo.setContents(contents);
+				
+				MemberVO mvo = new MemberVO();
+				mvo.setName(name);
+				
+				previewvo.setMvo(mvo);
+				previewvo.setWriteDate(writeDate);
+				
+				CommentList.add(previewvo);
+			}			
+			
+		} finally {
+			close();
+		}
+		return CommentList;			
+	}
+
+	
+	// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
+	@Override
+	public int likeAdd(Map<String, String> paraMap) throws SQLException {
+
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			conn.setAutoCommit(false); // 수동커밋으로 전환
+			
+			String sql = "DELETE FROM tbl_product_dislike "+
+						 "WHERE fk_userid = ? AND fk_pnum = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(2, paraMap.get("pnum"));
+			
+			// 정상적으로 완료되면 아래로 내려갈 것 
+			pstmt.executeUpdate();
+			
+			sql = "INSERT INTO tbl_product_like(fk_userid, fk_pnum) "+
+				  "VALUES(?, ?) ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(2, paraMap.get("pnum"));
+			
+			n = pstmt.executeUpdate();
+			
+			// 정상완료되면 커밋함.
+			if (n == 1) conn.commit();
+			
+		} catch(SQLIntegrityConstraintViolationException e) {
+			// 제약조건위배로 정상완료되지 않으면 롤백함.
+			conn.rollback();
+			
+		} finally {
+			close();
+		}
+		return n;
+	}
+
+	
+	// 특정 회원이 특정 제품에 대해 싫어요에 투표하기(insert)
+	@Override
+	public int dislikeAdd(Map<String, String> paraMap) throws SQLException {
+
+
+		int n = 0;
+		
+		try {
+			conn = ds.getConnection();
+			
+			conn.setAutoCommit(false); // 수동커밋으로 전환
+			
+			String sql = "DELETE FROM tbl_product_like "+
+						 "WHERE fk_userid = ? AND fk_pnum = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(2, paraMap.get("pnum"));
+			
+			// 정상적으로 완료되면 아래로 내려갈 것 
+			pstmt.executeUpdate();
+			
+			sql = "INSERT INTO tbl_product_dislike(fk_userid, fk_pnum) "+
+				  "VALUES(?, ?) ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, paraMap.get("userid"));
+			pstmt.setString(2, paraMap.get("pnum"));
+			
+			n = pstmt.executeUpdate();
+			
+			// 정상완료되면 커밋함.
+			if (n == 1) conn.commit();
+			
+		} catch(SQLIntegrityConstraintViolationException e) {
+			// 제약조건위배로 정상완료되지 않으면 롤백함.
+			conn.rollback();
+			
+		} finally {
+			close();
+		}
+		return n;
+	}
+
+	
+	// 특정 제품에 대한 좋아요, 싫어요의 투표결과 조회(select)하기
+	@Override
+	public Map<String, Integer> getLikeDislikeCnt(String pnum) throws SQLException {
+
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		try {
+			conn = ds.getConnection();
+			
+			String sql = "SELECT (SELECT count(*) "+
+						 "        FROM tbl_product_like "+
+						 "        WHERE fk_pnum = ?) AS likecnt "+
+						 "      ,(SELECT count(*) "+
+						 "        FROM tbl_product_dislike "+
+						 "        WHERE fk_pnum = ?) AS dislikecnt  "+
+						 "FROM dual";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, pnum);
+			pstmt.setString(2, pnum);
+			
+			rs = pstmt.executeQuery();
+
+			rs.next();
+			
+			map.put("likecnt", rs.getInt(1));
+			map.put("dislikecnt", rs.getInt(2));
+			
+		} finally {
+			close();
+		}
+		return map;
+	}
+
+	
+	// 특정 카테고리에 속하는 제품들을 일반적인 페이징 처리하여 조회(select) 해오기
+	@Override
+	public List<ProductVO> selectProductByCategory(Map<String, String> paraMap) throws SQLException {
+
+		List<ProductVO> prodList = new ArrayList<>();
+		
+		try {
+			conn = ds.getConnection();
+			
+			String sql = "select cname, sname, pnum, pname, pcompany, pimage1, pimage2, pqty, price, saleprice, pcontent, point, pinputdate  "+
+					"from  "+
+					"( "+
+					"    select rownum AS RNO, cname, sname, pnum, pname, pcompany, pimage1, pimage2, pqty, price, saleprice, pcontent, point, pinputdate  "+
+					"    from  "+
+					"    ( "+
+					"        select C.cname, S.sname, pnum, pname, pcompany, pimage1, pimage2, pqty, price, saleprice, pcontent, point, pinputdate  "+
+					"        from  "+
+					"            (select pnum, pname, pcompany, pimage1, pimage2, pqty, price, saleprice, pcontent, point   "+
+					"                  , to_char(pinputdate, 'yyyy-mm-dd') as pinputdate, fk_cnum, fk_snum    "+
+					"             from tbl_product    "+
+					"             where fk_cnum = ?   "+
+					"             order by pnum desc  "+
+					"        ) P  "+
+					"        JOIN tbl_category C  "+
+					"        ON P.fk_cnum = C.cnum  "+
+					"        JOIN tbl_spec S  "+
+					"        ON P.fk_snum = S.snum  "+
+					"    ) V  "+
+					") T  "+
+					"where T.RNO between ? and ?";
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			int currentShowPageNo = Integer.parseInt(paraMap.get("currentShowPageNo"));
+			int sizePerPage = 10; // 한 페이지당 화면상에 보여줄 제품의 개수는 10으로 한다.
+			
+			pstmt.setString(1, paraMap.get("cnum"));
+			pstmt.setInt(2, (currentShowPageNo * sizePerPage) - (sizePerPage - 1)); // 공식
+			pstmt.setInt(3, (currentShowPageNo * sizePerPage)); // 공식
+			
+			rs = pstmt.executeQuery();
+
+			while(rs.next()) {
+				ProductVO pvo = new ProductVO();
+				
+				pvo.setPnum(rs.getInt("pnum"));			// 제품번호
+				pvo.setPname(rs.getString("pname"));	// 제품명
+				
+				CategoryVO categvo = new CategoryVO();
+				categvo.setCname(rs.getString("cname"));//카테고리명
+				
+				pvo.setCategvo(categvo); //카테고리
+				pvo.setPcompany(rs.getString("pcompany")); // 제조회사명
+				pvo.setPimage1(rs.getString("pimage1"));   // 제품이미지1 이미지 파일명
+				pvo.setPimage2(rs.getString("pimage2"));   // 제품이미지2 이미지 파일명
+				pvo.setPqty(rs.getInt("pqty"));			   // 제품 재고량
+				pvo.setPrice(rs.getInt("price"));		   // 제품 정가
+				pvo.setSaleprice(rs.getInt("saleprice"));  // 제품 판매가(할인해서 팔 것이므로)
+				
+				SpecVO spvo = new SpecVO();
+				spvo.setSname(rs.getString("sname"));	// 스펙이름
+				
+				pvo.setSpvo(spvo);	// 스펙
+				
+				pvo.setPcontent(rs.getString("pcontent")); // 제품설명
+				pvo.setPoint(rs.getInt("point")); 		   // 포인트 점수
+				pvo.setPinputdate(rs.getString("pinputdate")); // 제품입고일자
+				
+				prodList.add(pvo);
+			}
+			
+			
+		} finally {
+			close();
+		}
+		
+		return prodList;
+	}
+
+	
+	// 페이지바를 만들기 위해서 특정카테고리의 제품개수에 대한 총 페이지수 알아오기(select)
+	@Override
+	public int getTotalPage(String cnum) throws SQLException {
+
+		int totalPage = 0;
+
+		try {
+			
+			conn = ds.getConnection();
+			
+			String sql = "select ceil( count(*)/10 ) " + // 10이 sizePerPage 이다.
+						 "from tbl_product " +
+						 "where fk_cnum = ? ";
+			
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, cnum);
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			
+			totalPage = rs.getInt(1);
+			
+		} finally {
+			close();
+		}
+		return totalPage;
+	}
 	
 	
-	
-	
+		
 }

@@ -10,12 +10,12 @@
 
 <style>
    table#tblMemberRegister {
-          width: 93%;
+         width: 93%;
           
-          /* 선을 숨기는 것 */
-          border: hidden;
+         /* 선을 숨기는 것 */
+         border: hidden;
           
-          margin: 10px;
+         margin: 10px;
    }  
    
    table#tblMemberRegister #th {

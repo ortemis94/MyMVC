@@ -111,8 +111,22 @@ public class LoginAction extends AbstractController {
 			}else {
 			
 				// 막바로 페이지 이동을 시킨다.
+				
+				// 특정 제품상세 페이지를 보았을 경우 로그인을 하면 시작페이지로 가는 것이 아니라
+				// 방금 보았던 특정 제품상세 페이지로 가기 위한 것이다.
+				String goBackURL = (String)session.getAttribute("goBackURL");
+				// shop/prodView.up?pnum=70
+				// 또는 
+				// null
+				
 				super.setRedirect(true);
-				super.setViewPage(request.getContextPath()+"/index.up");
+
+				if (goBackURL != null) { // goBackURL이 null이 아니라면
+					super.setViewPage(request.getContextPath()+"/"+goBackURL); // goBackURL에 있는 주소로 이동시키고
+					session.removeAttribute("goBackURL"); // 반드시 session에 있는 goBackURL을 지워준다. 
+				}else {
+					super.setViewPage(request.getContextPath()+"/index.up");
+				}
 				
 			}
 			

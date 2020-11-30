@@ -22,7 +22,7 @@
 	            text-align: center;">
 	      <a href="<%= request.getContextPath()%>/shop/mallHome1.up">전체</a>&nbsp;
 	      <c:forEach var="map" items="${requestScope.categoryList}">
-	      	  <a href="<%= request.getContextPath()%>/shop/mallByCategory.up?cnum=${map.cnum}&cname=${map.cname}">${map.cname}</a>&nbsp;
+	      	  <a href="<%= request.getContextPath()%>/shop/mallByCategory.up?cnum=${map.cnum}">${map.cname}</a>&nbsp;
 	      </c:forEach>
 	</div>
 </c:if>    

@@ -39,6 +39,30 @@ public interface InterProductDAO {
 	// 제품번호를 가지고서 해당 제품의 추가된 이미지 정보를 조회해오기
 	List<String> getImagesByPnum(String pnum) throws SQLException;
 
+	// Ajax를 이용한 특정 제품의 상품후기를 입력(insert)하기
+	int addComment(PurchaseReviewsVO reviewsvo) throws SQLException;
+
+	// Ajax를 이용한 특정 제품의 상품후기를 조회(select)하기
+	List<PurchaseReviewsVO> commentList(String fk_pnum) throws SQLException;
+
+	// 특정 회원이 특정 제품에 대해 좋아요에 투표하기(insert)
+	int likeAdd(Map<String, String> paraMap) throws SQLException;
+
+	// 특정 회원이 특정 제품에 대해 싫어요에 투표하기(insert)
+	int dislikeAdd(Map<String, String> paraMap) throws SQLException;
+
+	// 특정 제품에 대한 좋아요, 싫어요의 투표결과 조회(select)하기
+	Map<String, Integer> getLikeDislikeCnt(String pnum) throws SQLException;
+
+	// 특정 카테고리에 속하는 제품들을 일반적인 페이징 처리하여 조회(select) 해오기
+	List<ProductVO> selectProductByCategory(Map<String, String> paraMap) throws SQLException;
+
+	// 페이지바를 만들기 위해서 특정카테고리의 제품개수에 대한 총 페이지수 알아오기(select)
+	int getTotalPage(String cnum) throws SQLException;
+	
+
+
+	
 	
 	
 	

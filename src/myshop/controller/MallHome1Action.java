@@ -2,8 +2,10 @@ package myshop.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import common.controller.AbstractController;
+import my.util.MyUtil;
 import myshop.model.*;
 
 public class MallHome1Action extends AbstractController {
@@ -22,6 +24,9 @@ public class MallHome1Action extends AbstractController {
 		System.out.println("~~~~ 확인용 totalHITCount : " + totalHITCount);
 		
 		request.setAttribute("totalHITCount", totalHITCount);
+		
+		// 로그인을 하면 시작페이지로 가는 것이 아니라 방금 보았던 그 페이지로 그대로 가기 위한 것임.
+		super.goBackURL(request);
 		
 		super.setRedirect(false);
 		super.setViewPage("/WEB-INF/myshop/mallHome1.jsp");

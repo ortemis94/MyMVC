@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import common.controller.AbstractController;
 import my.util.MyUtil;
@@ -45,8 +46,9 @@ public class ProdViewAction extends AbstractController {
 			request.setAttribute("pvo", pvo); // 제품의 정보
 			request.setAttribute("imgList", imgList); // 해당 제품의 추가된 이미지 정보
 			
-		//	request.setAttribute("goBackURL", MyUtil.getCurrentURL(request)); 
-			// 로그인을 하지 않은 상태에서 특정제품을 조회한 후 장바구니 담기나 바로주문하기 할때 로그인 하라는 메시지를 받은 후 로그인 하면 메인페이지로 가는 것이 아니라 방금 조회한 특정제품 페이지로 돌아가기 위한 것임.
+			// 로그인을 하지 않은 상태에서 특정제품을 조회한 후 "장바구니 담기"나 "바로주문하기" 할 때와 "제품후기쓰기"를 할 때, 로그인 하라는 메시지를 받은 후 로그인 하면 메인페이지로 가는 것이 아니라 방금 조회한 특정제품 페이지로 돌아가기 위한 것임.
+			// 로그인을 하면 시작페이지로 가는 것이 아니라 방금 보았던 그 페이지로 그대로 가기 위한 것임.
+			super.goBackURL(request);
 			
 		//	super.setRedirect(false);
 			super.setViewPage("/WEB-INF/myshop/prodView.jsp");

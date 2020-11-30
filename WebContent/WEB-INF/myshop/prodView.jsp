@@ -57,6 +57,10 @@
 	
 	  func_height();  // footer.jsp 에 있는 것임.
 
+	  goCommentListView(); // 제품 구매후기를 보여주는 것.
+
+	  goLikeDislikeCount(); // 좋아요, 싫어요 갯수를 보여주도록 하는 것이다. 
+	  
 	  $("input#spinner").spinner( {
 		   spin: function(event, ui) {
 			   if(ui.value > 100) {
@@ -70,16 +74,11 @@
 		   }
 	   } );// end of $("input#spinner").spinner({});----------------	 
 	  
-	   
-          //   goCommentListView();  // 이미 등록된 제품후기를 보여주도록 하는 것이다.
-	   
-          //   goLikeDislikeCount(); // 좋아요, 싫어요 갯수를 보여주도록 하는 것이다. 
-	   
-	  <%-- 
+          
 	   // **** 제품후기 쓰기 ****// 
 	   $("button.btnCommentOK").click(function(){
 		   
-		   if(${empty sessionScope.loginuser}) {
+		   if(${empty sessionScope.loginUser}) {
 			   alert("제품사용 후기를 작성하시려면 먼저 로그인 하셔야 합니다.");
 			   return;
 		   }
@@ -90,7 +89,14 @@
 			   alert("제품후기 내용을 입력하세요!!");
 			   return; 
 		   }
-		   
+
+		   <%--
+		   // 보내야할 데이터를 선정하는 첫번째 방법
+		   var queryString = {"fk_userid":'${sessionScope.loginUser.userid}',
+				   			  "fk_pnum":${pvo.pnum},
+				   			  "contents":$("textarea#commentContents").val() };
+		   --%>
+		   // 보내야할 데이터를 선정하는 두번째 방법
 		   // jQuery에서 사용하는 것으로써,
 		   // form태그의 선택자.serialize(); 을 해주면 form 태그내의 모든 값들을 name값을 키값으로 만들어서 보내준다. 
 		   var queryString = $("form[name=commentFrm]").serialize();
@@ -108,22 +114,22 @@
 			   error: function(request, status, error){
 					alert("code: "+request.status+"\n"+"message: "+request.responseText+"\n"+"error: "+error);
 			   }
-		   });
+		   }); 
 	   });
 	   
-   --%>
    }); // end of $(document).ready();------------------------------
    
-  <%-- 
+
    // 특정 제품의 제품후기글들을 보여주는 함수
    function goCommentListView() {
 
 	   $.ajax({
 		   url:"/MyMVC/shop/commentList.up",
 		   type:"GET",
-		   data:{"pnum":"${pvo.pnum}"},
+		   data:{"fk_pnum":${pvo.pnum}},
 		   dataType:"JSON",
 		   success:function(json) {
+			    // [{"contents":"제품후기내용물1", "name":"작성자이름1", "writeDate":"작성일자1"} {"contents":"제품후기내용물2", "name":"작성자이름2", "writeDate":"작성일자2"}]
 			    var html = "";
 				
 				if (json.length > 0) {    
@@ -162,10 +168,10 @@
 		   url:"/MyMVC/shop/likeAdd.up",
 		   type:"POST",
 		   data:{"pnum":pnum,
-			     "userid":"${sessionScope.loginuser.userid}"},
+			     "userid":"${sessionScope.loginUser.userid}"},
 		   dataType:"JSON", 
 		   success:function(json) {
-			   //alert(json.msg);
+			  // alert(json.msg);
 			     swal(json.msg);
 			     goLikeDislikeCount();
 		   },
@@ -184,10 +190,10 @@
 		   url:"/MyMVC/shop/dislikeAdd.up",
 		   type:"POST",
 		   data:{"pnum":pnum,
-			     "userid":"${sessionScope.loginuser.userid}"},
+			     "userid":"${sessionScope.loginUser.userid}"},
 		   dataType:"JSON", 
 		   success:function(json) {
-			   //alert(json.msg);
+			  // alert(json.msg);
 			     swal(json.msg);
 			     goLikeDislikeCount();
 		   },
@@ -217,7 +223,8 @@
 	   });	   
 	   
    }// end of function goLikeDislikeCount()-------------------
-   --%>
+
+   
    <%--
    function goCart(pnum) {
 	   // pnum 은 장바구니에 담을 제품번호 이다.
@@ -346,12 +353,13 @@
     </div> 
     <form name="commentFrm">
     	<div>
-    		<textarea cols="100" class="customHeight" name="commentContents" id="commentContents"></textarea>
+    		<textarea cols="100" class="customHeight" name="contents" id="commentContents"></textarea>
     	</div>
     	<div>
     		<button type="button" class="customHeight btnCommentOK">후기등록</button>
     	</div>
-    	<input type="hidden" name="pnum" value="${pvo.pnum}" />
+    	<input type="hidden" name="fk_userid" value="${sessionScope.loginUser.userid}" />
+    	<input type="hidden" name="fk_pnum" value="${pvo.pnum}" />
     </form>
 	
 </div>

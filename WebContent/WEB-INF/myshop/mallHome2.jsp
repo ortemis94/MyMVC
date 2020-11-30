@@ -52,8 +52,12 @@
 		
 		//  웹브라우저창의 높이값(디바이스마다 다르게 표현되는 고정값) 
 		//	console.log( "$(window).height() => " + $(window).height() ); 
+		
+		//  아래는 이벤트가 발생되는 숫자를 만들기 위해서 스크롤탑의 위치값에 +1 을 더해서 보정해준 것이다.
+        //  console.log( "$(window).scrollTop() + 1 => " + ( $(window).scrollTop() + 1 ) );
+        //  console.log( "$(document).height() - $(window).height() => " + ( $(document).height() - $(window).height() ) );
 			
-			if ( $(window).scrollTop() >= $(document).height() - $(window).height() ) {
+        	if ( $(window).scrollTop() + 1 >= $(document).height() - $(window).height() ) {
 
 				var totalHITCount = Number( $("span#totalHITCount").text() );
 				var countHIT = Number( $("span#countHIT").text() );

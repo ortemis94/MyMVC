@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import member.model.MemberVO;
+import my.util.MyUtil;
 import myshop.model.*;
 
 public abstract class AbstractController implements InterCommand {
@@ -82,6 +83,14 @@ public abstract class AbstractController implements InterCommand {
 	
 		request.setAttribute("categoryList", categoryList);
 	}
+	
+	
+	// ***** 로그인을 하면 시작페이지로 가는 것이 아니라 방금 보았던 그 페이지로 그대로 가기 위한 메소드 ***** //
+	public void goBackURL(HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		session.setAttribute("goBackURL", MyUtil.getCurrentURL(request));
+	}
+	
 	
 	
 	

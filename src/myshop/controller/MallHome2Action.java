@@ -23,6 +23,9 @@ public class MallHome2Action extends AbstractController {
 		
 		request.setAttribute("totalHITCount", totalHITCount);
 		
+		// 로그인을 하면 시작페이지로 가는 것이 아니라 방금 보았던 그 페이지로 그대로 가기 위한 것임.
+		super.goBackURL(request);
+		
 		super.setRedirect(false);
 		super.setViewPage("/WEB-INF/myshop/mallHome2.jsp");
 

@@ -59,6 +59,9 @@ public interface InterProductDAO {
 
 	// 페이지바를 만들기 위해서 특정카테고리의 제품개수에 대한 총 페이지수 알아오기(select)
 	int getTotalPage(String cnum) throws SQLException;
+
+	// tbl_map(위,경도) 테이블에 있는 정보 가져오기(select) 
+	List<HashMap<String, String>> selectStoreMap() throws SQLException; 
 	
 
 

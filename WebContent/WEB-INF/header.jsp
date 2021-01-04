@@ -71,6 +71,10 @@
 				<a href="<%= ctxPath %>/shop/mallHome2.up">쇼핑몰홈2</a>
 			</div>
 			
+			<div class="col-md-1">
+            	<a href="<%= ctxPath %>/shop/location.up">매장찾기</a>
+         	</div>
+         	
 			<c:if test="${sessionScope.loginUser.userid eq 'admin'}">
 				<div class="col-md-2">
 					<a href="<%= ctxPath %>/shop/admin/productRegister.up">제품등록</a>

@@ -6,5 +6,6 @@ import javax.servlet.http.HttpServletResponse;
 public interface InterCommand {
 
 	void execute(HttpServletRequest request, HttpServletResponse response) throws Exception;
+	// public abstract가 생략되어 있는 것.
 	
 }

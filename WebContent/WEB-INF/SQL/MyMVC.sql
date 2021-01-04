@@ -1190,7 +1190,9 @@ String sql = "select cname, sname, pnum, pname, pcompany, pimage1, pimage2, pqty
 "where T.RNO between 51 and 60";
 
 
-
+select imgfilename
+from tbl_main_image
+		order by imgno desc;
 
 
 

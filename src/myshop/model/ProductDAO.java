@@ -729,5 +729,46 @@ public class ProductDAO implements InterProductDAO {
 	}
 	
 	
+	// tbl_map(위,경도) 테이블에 있는 정보 가져오기(select) 
+	@Override
+	public List<HashMap<String, String>> selectStoreMap() throws SQLException {
+
+		List<HashMap<String, String>> storeList = new ArrayList<>();
+	      
+		try {
+			conn = ds.getConnection();
+	         
+			String sql = " select storeID, storeName, storeUrl, storeImg, storeAddress, lat, lng, zindex " + 
+	                     " from tbl_map " + 
+	                     " order by zindex asc ";
+	         
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+	         
+			while(rs.next()) {
+				HashMap<String, String> map = new HashMap<>();
+	            map.put("STOREID", rs.getString("STOREID"));
+	            map.put("STORENAME", rs.getString("STORENAME"));
+	            map.put("STOREURL", rs.getString("STOREURL"));
+	            map.put("STOREIMG", rs.getString("STOREIMG"));
+	            map.put("STOREADDRESS", rs.getString("STOREADDRESS"));
+	            map.put("LAT", rs.getString("LAT"));
+	            map.put("LNG", rs.getString("LNG"));
+	            map.put("ZINDEX", rs.getString("ZINDEX"));
+	                        
+	            storeList.add(map); 
+			}
+	         
+		} finally {
+			close();
+		}
+	      
+		return storeList;      
+	}   
+	
+	
+	
+	
 		
 }
